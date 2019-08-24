@@ -1,0 +1,10 @@
+{
+  "domain_name": "DOMAIN_NAME",
+  "tenant_id": "PROJECT_ID",
+  "username": "USER_NAME",
+  "password": "PASSWORD",
+  "networks": "NETWORK_ID",
+  "region": "REGIONS",
+  "availability_zone": "ZONE",
+  "volume_type": "fast.ZONE"
+}

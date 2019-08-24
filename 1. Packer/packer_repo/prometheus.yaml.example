@@ -1,0 +1,29 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+
+rule_files:
+  # - "first_rules.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['localhost:9090']
+
+  - job_name: 'node-exporter'
+    openstack_sd_configs:
+    - role: instance
+      port: 9100
+      refresh_interval: 40s
+      identity_endpoint: https://api.selvpc.ru/identity/v3
+      domain_name: DOMAIN
+      region: REGION
+      username: USERNAME
+      password: PASSWORD
+      project_id: PROJECT_ID
+

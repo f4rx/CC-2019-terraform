@@ -1,0 +1,88 @@
+{
+  "variables": {
+    "region": null,
+    "tenant_id": null,
+    "domain_name": null,
+    "username": null,
+    "password": null,
+    "networks": null,
+    "availability_zone": null,
+    "volume_type": null,
+    "volume_size": "5"
+  },
+  "sensitive-variables": [
+    "password"
+  ],
+  "builders": [
+    {
+      "name": "bastion-host",
+      "type": "openstack",
+      "identity_endpoint": "https://api.selvpc.ru/identity/v3",
+      "region": "{{user `region`}}",
+      "tenant_id": "{{user `tenant_id`}}",
+      "domain_name": "{{user `domain_name`}}",
+      "username": "{{user `username`}}",
+      "password": "{{user `password`}}",
+      "networks": "{{user `networks`}}",
+      "availability_zone": "{{user `availability_zone`}}",
+      "volume_type": "{{user `volume_type`}}",
+      "volume_size": "{{user `volume_size`}}",
+      "floating_ip_network": "external-network",
+      "reuse_ips": true,
+      "flavor": "BL1.1-1024",
+      "ssh_username": "root",
+      "image_name": "centos-bastion-packer-{{timestamp}}",
+      "source_image_name": "CentOS 7 Minimal 64-bit",
+      "use_floating_ip": true,
+      "use_blockstorage_volume": true,
+      "image_visibility": "private",
+      "image_tags": ["bastion-server"]
+    },
+    {
+      "name": "www-node",
+      "type": "openstack",
+      "identity_endpoint": "https://api.selvpc.ru/identity/v3",
+      "region": "{{user `region`}}",
+      "tenant_id": "{{user `tenant_id`}}",
+      "domain_name": "{{user `domain_name`}}",
+      "username": "{{user `username`}}",
+      "password": "{{user `password`}}",
+      "networks": "{{user `networks`}}",
+      "availability_zone": "{{user `availability_zone`}}",
+      "volume_type": "{{user `volume_type`}}",
+      "volume_size": "{{user `volume_size`}}",
+      "floating_ip_network": "external-network",
+      "reuse_ips": true,
+      "flavor": "BL1.1-1024",
+      "ssh_username": "root",
+      "image_name": "centos-node-packer-{{timestamp}}",
+      "source_image_name": "CentOS 7 Minimal 64-bit",
+      "use_floating_ip": true,
+      "use_blockstorage_volume": true,
+      "image_visibility": "private",
+      "image_tags": [ "www-node" ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "setup_prometheus_server.sh",
+      "only": [ "bastion-host" ]
+    },
+    {
+      "type": "file",
+      "source": "prometheus.yaml",
+      "destination": "/etc/prometheus/prometheus.yaml",
+      "only": [ "bastion-host" ]
+    },
+    {
+      "type": "shell",
+      "script": "setup_node_exporter.sh"
+    },
+    {
+      "type": "shell",
+      "script": "setup_avatar.sh",
+      "only": [ "www-node" ]
+    }
+  ]
+}
